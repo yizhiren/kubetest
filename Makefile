@@ -45,6 +45,9 @@ check: vendor $(GOPATH)/bin/errcheck$(suffix)
 
 releases:
 	mkdir -p releases
+	
+bin/linux/arm64:
+	mkdir -p bin/linux/arm64
 
 bin/linux/amd64:
 	mkdir -p bin/linux/amd64
@@ -58,12 +61,16 @@ bin/windows/386:
 bin/darwin/amd64:
 	mkdir -p bin/darwin/amd64
 
-build: darwin linux windows
+build: darwin linux windows linux-arm64
 
 darwin: vendor releases bin/darwin/amd64
 	env GOOS=darwin GOAARCH=amd64 go build -ldflags '$(LDFLAGS)' -v -o $(CURDIR)/bin/darwin/amd64/$(NAME)
 	tar -C bin/darwin/amd64 -cvzf releases/$(NAME)-darwin-amd64.tar.gz $(NAME)
 
+linux-arm64: vendor releases bin/linux/arm64
+	env GOOS=linux GOAARCH=arm64 go build -ldflags '$(LDFLAGS)' -v -o $(CURDIR)/bin/linux/arm64/$(NAME)
+	tar -C bin/linux/arm64 -cvzf releases/$(NAME)-linux-arm64.tar.gz $(NAME)
+	
 linux: vendor releases bin/linux/amd64
 	env GOOS=linux GOAARCH=amd64 go build -ldflags '$(LDFLAGS)' -v -o $(CURDIR)/bin/linux/amd64/$(NAME)
 	tar -C bin/linux/amd64 -cvzf releases/$(NAME)-linux-amd64.tar.gz $(NAME)
